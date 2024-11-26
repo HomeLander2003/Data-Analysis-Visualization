@@ -1,3 +1,4 @@
+#Data Analysis and Visualization
 This project focuses on analyzing and visualizing stock market data, specifically for Samsung (2007-2014). It includes:
 
 Data Cleaning: Handling missing values, removing duplicates, and renaming columns.
