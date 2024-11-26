@@ -87,7 +87,7 @@ class B:
            logging.error("No file to analyze......")
 
 
-a=A(file_path=r"yourfilepath")
+a=A(file_path=r"Saamsung_stock(2007-2014)")
 b=B()
 print("******************Cleaning File**************")
 print()
