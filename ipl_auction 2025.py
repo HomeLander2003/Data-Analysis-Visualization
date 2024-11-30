@@ -4,14 +4,14 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import style
-import os
+
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s [line %(lineno)d]')
 
 
 class A:
 
-   file_path=r"ipl_2025_auction_players.csv"
+   file_path=r"\ipl_2025_auction_players.csv"
 
    def __init__(self):
       self.file_process=self.file_path
@@ -21,26 +21,27 @@ class A:
    def clean_file(self,file_path):
       try:
         
-            self.filee=pd.read_csv(file_path)
-            
-            print(self.filee.head(10))
-            print(self.filee.info())
-            print(self.filee.isnull().sum())
-            print("Duplicate rows :" , self.filee.duplicated().sum())
+         self.filee=pd.read_csv(file_path)
+         
+         print(self.filee.head(10))
+         print(self.filee.info())
+         print(self.filee.isnull().sum())
+         print("Duplicate rows :" , self.filee.duplicated().sum())
 
-            if self.filee.duplicated().sum()>0:
-               self.filee.drop_duplicates(inplace=True)
-               self.filee.reset_index(drop=True,inplace=True)
+         if self.filee.duplicated().sum()>0:
+            self.filee.drop_duplicates(inplace=True)
+            self.filee.reset_index(drop=True,inplace=True)
 
-            print(self.filee.info())
-            print("Duplicate rows :" , self.filee.duplicated().sum())
+         print(self.filee.info())
+         print("Duplicate rows :" , self.filee.duplicated().sum())
 
-            if "Team" in self.filee.columns:  # Check if the "Team" column exists
-               self.filee["Team"] = self.filee["Team"].replace('-', "TBD")  
+         if "Team" in self.filee.columns:  # Check if the "Team" column exists
+            self.filee["Team"] = self.filee["Team"].replace('-', "TBD")  
 
-            print(self.filee.tail(20))
+         print(self.filee.tail(20))
 
-            return self.filee
+
+         return self.filee
 
       except FileNotFoundError as e:
          logging.error("File not found error: %s", e)
@@ -98,6 +99,7 @@ class A:
             plt.tight_layout()
             plt.show()
          
+
          except KeyError as e:
             print(e)
          except AttributeError as e:
@@ -107,6 +109,15 @@ class A:
          logging.error("No file to analyze and visualize....... ")
 
 
+   def save_file(self,path):
+      if self.filee is not None:
+        try:
+            self.filee.to_csv(path, index=False)  
+            logging.info(f"File has been saved at {path}")
+        except Exception as e:
+            logging.error(f"An error occurred while saving the file: {e}")
+
+      
 # if __name__=="main":
 a=A()
 print("******************Cleaning File**************")
@@ -117,7 +128,6 @@ print()
 
 print("***************Analyzing and visualizing file***************")
 a.analyze_visualize_file()
-   print()
-
-   print("***************Analyzing and visualizing file***************")
-   a.analyze_visulaize_file()
+print()
+print("***************Analyzing and visualizing file***************")
+a.save_file(path="ipl_mod.csv")
