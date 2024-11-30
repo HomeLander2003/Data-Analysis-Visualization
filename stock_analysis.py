@@ -1,4 +1,4 @@
-mport logging
+import logging
 from tkinter.font import BOLD
 import numpy as np
 import pandas as pd
@@ -36,7 +36,7 @@ class A:
             print("Duplicate rows :" , self.filee.duplicated().sum())
 
             if "Team" in self.filee.columns:  # Check if the "Team" column exists
-               self.filee["Team"] = self.filee["Team"].replace('-', "not decided")  
+               self.filee["Team"] = self.filee["Team"].replace('-', "TBD")  
 
             print(self.filee.tail(20))
 
@@ -47,51 +47,76 @@ class A:
       except Exception as e:
          logging.error("An error occurred during file cleaning: %s", e)
 
-   def analyze_visulaize_file(self):
+   def analyze_visualize_file(self):
       
       if self.filee is not None:
-         print(self.filee.describe())
-         print(self.filee.dtypes)
+         try:
+            print(self.filee.describe())
+            print(self.filee.dtypes)
 
-         gr1=self.filee.groupby(["Type"])["Type"].count()
-         print(gr1)
-         print()
-         gr2=self.filee.groupby(["Team"])["Players"].count()
-         print(gr2)
-         print()
-   
-         print()
-         print(gr1.ndim)
-         print(gr2.ndim)
-
+            gr1=self.filee.groupby(["Type"])["Type"].count()
+            print(gr1)
+            print()
+            gr2=self.filee.groupby(["Team"])["Players"].count()
+            print(gr2)
+            print()
+            gr3=self.filee.groupby(["Sold"])["Sold"].count()
+            print(gr3)
       
-      
-         plt.figure(figsize=(10,6))
-         plt.title("Player Type Distribution",fontsize=25,weight=BOLD,color="purple",loc="left")
+            print()
+            print(gr1.ndim)
+            print(gr2.ndim)
+            print(gr3.ndim)
 
-         # plt.pie(gr1.values,labels=gr1.index,autopct='%1.1f%%',textprops={'color':'black', 'fontsize': 9, 'weight': 'bold'},shadow=True
-         #        ,explode=[0.05,0.05,0.05,0.05],pctdistance=1.15,labeldistance=1.275)
          
-         for index, val in enumerate(gr2.values):
-            plt.text(index, val + 2,  # Position the text above the bar
-               str(val), ha='center', va='bottom', fontsize=10, color='black',weight="bold")
+            
+            plt.style.use("dark_background")
+            plt.figure(figsize=(10,6))
+            plt.title("IPL 2025 AUCTION DETAILS",fontsize=25,weight=BOLD,color="purple",loc="left")
 
-         plt.bar(gr2.index,gr2.values,label="Players in each team")
+
+            #pie chart for player type
+            # plt.pie(gr1.values,labels=gr1.index,autopct='%1.1f%%',textprops={'color':'black', 'fontsize': 9, 'weight': 'bold'},shadow=True
+            #        ,explode=[0.05,0.05,0.05,0.05],pctdistance=1.15,labeldistance=1.275)
+
+
+            #barchart for player distribution
+            # for index, val in enumerate(gr2.values):
+            #    plt.text(index, val + 2,  # Position the text above the bar
+            #    str(val), ha='center', va='bottom', fontsize=10, color='white',weight="bold")
+            # plt.bar(gr2.index,gr2.values,label="Players in each team")
+
+
+            #barchart for player distribution per price
+            for index, val in enumerate(gr3.values):
+               plt.text(index, val + 2,  # Position the text above the bar
+               str(val), ha='center', va='bottom', fontsize=10, color='white',weight="bold")
+            plt.bar(gr3.index,gr3.values,label="Players Price",color="red",edgecolor="white")
+            
+            plt.legend(loc="upper left",shadow=True)
+            plt.xticks(rotation=90)
+            plt.tight_layout()
+            plt.show()
          
-         plt.legend(loc="upper left",shadow=True)
-         plt.show()
-         
+         except KeyError as e:
+            print(e)
+         except AttributeError as e:
+            print(e)
 
       else:
          logging.error("No file to analyze and visualize....... ")
 
 
-if __name__=="main":
-   a=A()
-   print("******************Cleaning File**************")
-   print()
+# if __name__=="main":
+a=A()
+print("******************Cleaning File**************")
+print()
 
-   a.clean_file(file_path=a.file_process)
+a.clean_file(file_path=a.file_process)
+print()
+
+print("***************Analyzing and visualizing file***************")
+a.analyze_visualize_file()
    print()
 
    print("***************Analyzing and visualizing file***************")
