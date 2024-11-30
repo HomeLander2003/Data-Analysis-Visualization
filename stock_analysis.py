@@ -1,4 +1,5 @@
-import logging
+mport logging
+from tkinter.font import BOLD
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -9,90 +10,89 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 
 class A:
-    def __init__(self,file_path):
-        self.filepath=file_path
 
-class B:
+   file_path=r"ipl_2025_auction_players.csv"
 
-    def __init__(self):
-        self.filee = None 
-
-    def file_clean(self,file_path):
-
-         if os.path.isfile(file_path):
-
+   def __init__(self):
+      self.file_process=self.file_path
+      self.filee=None
+      
+   
+   def clean_file(self,file_path):
+      try:
+        
             self.filee=pd.read_csv(file_path)
-            print(self.filee)
+            
+            print(self.filee.head(10))
             print(self.filee.info())
-            print(self.filee.columns)
-
-            #printing null values and duplicate 
             print(self.filee.isnull().sum())
-            print("duplicate rows found " , self.filee.duplicated().sum())
-            #no null values and duplicate rows found so we are not using dropna and dropduplicate method
+            print("Duplicate rows :" , self.filee.duplicated().sum())
 
-            #renaming unnamed column
-            if 'Unnamed: 0' in self.filee.columns:
-                self.filee.rename(columns={'Unnamed: 0':"Date"},inplace=True)
+            if self.filee.duplicated().sum()>0:
+               self.filee.drop_duplicates(inplace=True)
+               self.filee.reset_index(drop=True,inplace=True)
 
-            #converting whole date info into single year
-            if 'Date' in self.filee.columns:
-             self.filee['Date']=pd.to_datetime(self.filee['Date']).dt.year
-             
-            print(self.filee.head(10)) 
-                     
+            print(self.filee.info())
+            print("Duplicate rows :" , self.filee.duplicated().sum())
 
-            return self.filee  
+            if "Team" in self.filee.columns:  # Check if the "Team" column exists
+               self.filee["Team"] = self.filee["Team"].replace('-', "not decided")  
 
-         else:
-            logging.error("file not found.......")
+            print(self.filee.tail(20))
 
-    def file_analyze_visualize(self):
+            return self.filee
 
-        if self.filee is not None:
-          print(self.filee.columns)
-          print(self.filee.describe())
+      except FileNotFoundError as e:
+         logging.error("File not found error: %s", e)
+      except Exception as e:
+         logging.error("An error occurred during file cleaning: %s", e)
 
-          samp = self.filee.groupby("Date")[["Open", "Close"]].max().reset_index()
-          print(samp)
-          print(samp.columns)
-          samp = self.filee.groupby("Date")[["High", "Low"]].max().reset_index()
-          print(samp)
-          print(samp.columns)
-          
-          plt.style.use("dark_background")
-          plt.figure(figsize=(10,6))
+   def analyze_visulaize_file(self):
+      
+      if self.filee is not None:
+         print(self.filee.describe())
+         print(self.filee.dtypes)
 
-          #using line plot
-          # plt.plot(samp["Date"],samp["Open"],label="Open Price",color="red")
-          # plt.plot(samp["Date"],samp["Close"],label="Close Price",color="green")
+         gr1=self.filee.groupby(["Type"])["Type"].count()
+         print(gr1)
+         print()
+         gr2=self.filee.groupby(["Team"])["Players"].count()
+         print(gr2)
+         print()
+   
+         print()
+         print(gr1.ndim)
+         print(gr2.ndim)
 
-          # using bar plot
-          plt.bar(samp["Date"],samp["High"],label="High Price",color="red")
-          plt.bar(samp["Date"],samp["Low"],label="Low Price",color="green")
+      
+      
+         plt.figure(figsize=(10,6))
+         plt.title("Player Type Distribution",fontsize=25,weight=BOLD,color="purple",loc="left")
 
-        #   plt.scatter(samp["Date"],samp["Open"])
-        #   plt.scatter(samp["Date"],samp["Close"])
-          plt.title("Samsung Stock......",color="green",weight="bold",fontsize=50)
-          plt.xlabel("Year(2007-2014)",labelpad=8,color="green",weight="bold",fontsize=20)
-          plt.ylabel("Price(Open And Close)",labelpad=8,color="green",weight="bold",fontsize=20)
-          plt.xticks(samp["Date"], rotation=90) 
-          plt.tight_layout()
-          plt.legend(shadow=True)
-          plt.gray()
-          plt.grid()
-          plt.show()
+         # plt.pie(gr1.values,labels=gr1.index,autopct='%1.1f%%',textprops={'color':'black', 'fontsize': 9, 'weight': 'bold'},shadow=True
+         #        ,explode=[0.05,0.05,0.05,0.05],pctdistance=1.15,labeldistance=1.275)
+         
+         for index, val in enumerate(gr2.values):
+            plt.text(index, val + 2,  # Position the text above the bar
+               str(val), ha='center', va='bottom', fontsize=10, color='black',weight="bold")
 
-        else:
-           logging.error("No file to analyze......")
+         plt.bar(gr2.index,gr2.values,label="Players in each team")
+         
+         plt.legend(loc="upper left",shadow=True)
+         plt.show()
+         
+
+      else:
+         logging.error("No file to analyze and visualize....... ")
 
 
-a=A(file_path=r"Saamsung_stock(2007-2014)")
-b=B()
-print("******************Cleaning File**************")
-print()
-b.file_clean(a.filepath)
-print()
-print("***************Analyzing and visualizing file***************")
-print()
-b.file_analyze_visualize()
+if __name__=="main":
+   a=A()
+   print("******************Cleaning File**************")
+   print()
+
+   a.clean_file(file_path=a.file_process)
+   print()
+
+   print("***************Analyzing and visualizing file***************")
+   a.analyze_visulaize_file()
